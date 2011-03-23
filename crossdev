@@ -235,8 +235,13 @@ parse_target() {
 }
 
 setup_portage_vars() {
+	CROSSDEV_OVERLAY=$(portageq envvar CROSSDEV_OVERLAY)
 	PORTDIR_OVERLAYS=$(portageq envvar PORTDIR_OVERLAY)
-	PORTDIR_OVERLAY=${PORTDIR_OVERLAYS%% *}
+	if [[ -z ${CROSSDEV_OVERLAY} ]] ; then
+		PORTDIR_OVERLAY=${PORTDIR_OVERLAYS%% *}
+	else
+		PORTDIR_OVERLAY=${CROSSDEV_OVERLAY}
+	fi
 	PORTDIR=$(portageq envvar PORTDIR)
 	PORT_LOGDIR=$(portageq envvar PORT_LOGDIR)
 	PORT_LOGDIR=${PORT_LOGDIR:-/var/log/portage}
