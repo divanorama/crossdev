@@ -14,7 +14,7 @@ PV = $(shell date +%Y%m%d)
 P = crossdev-$(PV)
 COMP = xz
 dist:
-	git archive --prefix=$(P)/ HEAD | sed 's:@CDEVPV@:$(PV):g' > $(P).tar
+	git archive --prefix=$(P)/ HEAD | sed 's:20100814:$(PV):g' > $(P).tar
 	-$(COMP) -f $(P).tar
 	du -b $(P).tar*
 
