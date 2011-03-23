@@ -243,7 +243,7 @@ setup_portage_vars() {
 	local arch=${ARCH} arch_set=${ARCH+set}
 	local chost=${CHOST} chost_set=${CHOST+set}
 	unset arch chost
-	eval $(portageq envvar -v PORTDIR_OVERLAY PORTDIR PORT_LOGDIR ARCH CHOST)
+	eval $(portageq envvar -v PORTDIR_OVERLAY PORTDIR PORT_LOGDIR ARCH CHOST CROSSDEV_OVERLAY)
 
 	# keep the original values, but be aware of the native ones
 	HARCH=${ARCH}
@@ -251,9 +251,15 @@ setup_portage_vars() {
 	HCHOST=${CHOST}
 	[[ ${chost_set} == "set" ]] && CHOST=${chost} || unset CHOST
 
-	# install our stuff to the last overlay in the list
 	PORTDIR_OVERLAYS=${PORTDIR_OVERLAY}
-	PORTDIR_OVERLAY=${PORTDIR_OVERLAYS%% *}
+	if [[ -z ${CROSSDEV_OVERLAY} ]] ; then
+		# install our stuff to the last overlay in the list
+		PORTDIR_OVERLAY=${PORTDIR_OVERLAYS%% *}
+	else
+		# install our stuff to specific overlay
+		PORTDIR_OVERLAY=${CROSSDEV_OVERLAY}
+	fi
+
 
 	# make sure we have a valid logdir
 	: ${PORT_LOGDIR:=/var/log/portage}
