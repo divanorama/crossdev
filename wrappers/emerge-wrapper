@@ -35,9 +35,15 @@ cross_wrap_etc()
 	setup_warning=false
 
 	cp -a "${PREFIX}"/share/crossdev/etc ${SYSROOT}/     || return 1
-	ln -sf /etc/make.globals ${SYSROOT}/etc/make.globals || return 1
+	local f
+	for f in /usr/share/portage/config/make.globals /etc/{portage/,}make.globals ; do
+		if [[ -e ${f} ]] ; then
+			ln -sf ${f} "${SYSROOT}"/etc/portage/make.globals || return 1
+			break
+		fi
+	done
 
-	local conf=${SYSROOT}/etc/make.conf
+	local conf=${SYSROOT}/etc/portage/make.conf
 
 	# Re-use existing CHOST->portage ARCH mapping code
 	ARCH=$(
@@ -53,6 +59,7 @@ cross_wrap_etc()
 		hppa)  E_MACHINE=PARISC ;;
 		ia64)  E_MACHINE=IA_64  ;;
 		m68k)  E_MACHINE=68K    ;;
+		x86)   E_MACHINE=386    ;;
 		*)     E_MACHINE=`echo ${ARCH} | tr '[:lower:]' '[:upper:]'` ;;
 	esac
 	E_MACHINE="EM_${E_MACHINE}"
@@ -68,6 +75,7 @@ cross_wrap_etc()
 		-e "s:__LIBC__:${LIBC}:g" \
 		-e "s:__E_MACHINE__:${E_MACHINE}:g" \
 		-e "s:__ARCH__:${ARCH}:g" \
+		-e "s:__CHOST__:${CHOST}:g" \
 		-e "s:__CBUILD__:${CBUILD}:g" \
 		"${conf}"
 	[[ ${EM_MACHINE} == "EM_UNKNOWN" ]] \
